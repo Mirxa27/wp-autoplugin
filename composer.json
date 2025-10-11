@@ -11,8 +11,8 @@
     ],
     "require": {},
     "autoload": {
-        "classmap": [
-            "includes/"
-        ]
+        "psr-4": {
+            "WP_Autoplugin\\": "includes/"
+        }
     }
 }
