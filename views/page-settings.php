@@ -20,30 +20,62 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="wrap">
 	<h1><?php esc_html_e( 'WP-Autoplugin Settings', 'wp-autoplugin' ); ?></h1>
 	<?php settings_errors(); ?>
-	<form method="post" action="options.php">
+	<form method="post" action="options.php" id="wp-autoplugin-settings-form">
 		<?php
 		settings_fields( 'wp_autoplugin_settings' );
 		do_settings_sections( 'wp_autoplugin_settings' );
 		?>
-		<table class="form-table">
+
+		<h2 class="title"><?php esc_html_e( 'API Configuration', 'wp-autoplugin' ); ?></h2>
+		<p class="description"><?php esc_html_e( 'Enter your API keys below. You only need to configure the API provider(s) you want to use. After entering your API keys, click "Save Changes" at the bottom of this page.', 'wp-autoplugin' ); ?></p>
+
+		<table class="form-table" role="presentation">
 			<tr valign="top">
-				<th scope="row"><?php esc_html_e( 'OpenAI API Key', 'wp-autoplugin' ); ?></th>
-				<td><input type="password" name="wp_autoplugin_openai_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_openai_api_key' ) ); ?>" class="large-text" /></td>
+				<th scope="row">
+					<label for="wp_autoplugin_openai_api_key"><?php esc_html_e( 'OpenAI API Key', 'wp-autoplugin' ); ?></label>
+				</th>
+				<td>
+					<input type="password" id="wp_autoplugin_openai_api_key" name="wp_autoplugin_openai_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_openai_api_key' ) ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'sk-...', 'wp-autoplugin' ); ?>" />
+					<p class="description"><?php esc_html_e( 'Get your API key from OpenAI at platform.openai.com', 'wp-autoplugin' ); ?></p>
+				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row"><?php esc_html_e( 'Anthropic API Key', 'wp-autoplugin' ); ?></th>
-				<td><input type="password" name="wp_autoplugin_anthropic_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_anthropic_api_key' ) ); ?>" class="large-text" /></td>
+				<th scope="row">
+					<label for="wp_autoplugin_anthropic_api_key"><?php esc_html_e( 'Anthropic API Key', 'wp-autoplugin' ); ?></label>
+				</th>
+				<td>
+					<input type="password" id="wp_autoplugin_anthropic_api_key" name="wp_autoplugin_anthropic_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_anthropic_api_key' ) ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'sk-ant-...', 'wp-autoplugin' ); ?>" />
+					<p class="description"><?php esc_html_e( 'Get your API key from Anthropic at console.anthropic.com', 'wp-autoplugin' ); ?></p>
+				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row"><?php esc_html_e( 'Google Gemini API Key', 'wp-autoplugin' ); ?></th>
-				<td><input type="password" name="wp_autoplugin_google_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_google_api_key' ) ); ?>" class="large-text" /></td>
+				<th scope="row">
+					<label for="wp_autoplugin_google_api_key"><?php esc_html_e( 'Google Gemini API Key', 'wp-autoplugin' ); ?></label>
+				</th>
+				<td>
+					<input type="password" id="wp_autoplugin_google_api_key" name="wp_autoplugin_google_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_google_api_key' ) ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'AIza...', 'wp-autoplugin' ); ?>" />
+					<p class="description"><?php esc_html_e( 'Get your API key from Google AI Studio at aistudio.google.com', 'wp-autoplugin' ); ?></p>
+				</td>
 			</tr>
 			<tr valign="top">
-				<th scope="row"><?php esc_html_e( 'xAI API Key', 'wp-autoplugin' ); ?></th>
-				<td><input type="password" name="wp_autoplugin_xai_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_xai_api_key' ) ); ?>" class="large-text" /></td>
+				<th scope="row">
+					<label for="wp_autoplugin_xai_api_key"><?php esc_html_e( 'xAI API Key', 'wp-autoplugin' ); ?></label>
+				</th>
+				<td>
+					<input type="password" id="wp_autoplugin_xai_api_key" name="wp_autoplugin_xai_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_xai_api_key' ) ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'xai-...', 'wp-autoplugin' ); ?>" />
+					<p class="description"><?php esc_html_e( 'Get your API key from xAI at x.ai', 'wp-autoplugin' ); ?></p>
+				</td>
 			</tr>
+		</table>
+
+		<h2 class="title"><?php esc_html_e( 'Model Selection', 'wp-autoplugin' ); ?></h2>
+		<p class="description"><?php esc_html_e( 'Select the AI model to use for plugin generation and other features.', 'wp-autoplugin' ); ?></p>
+
+		<table class="form-table" role="presentation">
 			<tr valign="top">
-				<th scope="row"><?php esc_html_e( 'Model', 'wp-autoplugin' ); ?></th>
+				<th scope="row">
+					<label for="wp_autoplugin_model"><?php esc_html_e( 'AI Model', 'wp-autoplugin' ); ?></label>
+				</th>
 				<td>
 					<select name="wp_autoplugin_model" id="wp_autoplugin_model">
 						<?php
@@ -65,10 +97,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 							?>
 						</optgroup>
 					</select>
+					<p class="description"><?php esc_html_e( 'Choose a model from the provider whose API key you configured above.', 'wp-autoplugin' ); ?></p>
 				</td>
 			</tr>
+		</table>
+
+		<h2 class="title"><?php esc_html_e( 'Custom Models', 'wp-autoplugin' ); ?></h2>
+		<p class="description"><?php esc_html_e( 'Add custom models using OpenAI-compatible APIs. Custom models are saved automatically when added.', 'wp-autoplugin' ); ?></p>
+
+		<table class="form-table" role="presentation">
 			<tr valign="top">
-				<th scope="row"><?php esc_html_e( 'Custom Models', 'wp-autoplugin' ); ?></th>
+				<th scope="row"><?php esc_html_e( 'Your Custom Models', 'wp-autoplugin' ); ?></th>
 				<td>
 					<div id="custom-models-list">
 						<!-- List will be populated via JS -->
@@ -91,7 +130,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</td>
 			</tr>
 		</table>
-		<?php submit_button(); ?>
+
+		<hr class="wp-autoplugin-settings-divider" />
+
+		<p class="submit">
+			<?php submit_button( __( 'Save Changes', 'wp-autoplugin' ), 'primary large', 'submit', false ); ?>
+			<span class="wp-autoplugin-save-hint"><?php esc_html_e( 'Click to save your API keys and model settings.', 'wp-autoplugin' ); ?></span>
+		</p>
 	</form>
 </div>
 <script>
@@ -197,6 +242,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	});
 </script>
 <style>
+	/* Settings Page Header and Section Styling */
+	#wp-autoplugin-settings-form h2.title {
+		font-size: 1.3em;
+		margin-top: 2em;
+		padding-bottom: 0.5em;
+		border-bottom: 1px solid #c3c4c7;
+	}
+
+	#wp-autoplugin-settings-form h2.title:first-of-type {
+		margin-top: 0;
+	}
+
 	/* Custom Models Section Styling */
 	#custom-models-list {
 		margin-bottom: 20px;
@@ -279,5 +336,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 		border-color: #2271b1;
 		box-shadow: 0 0 0 1px #2271b1;
 		outline: 2px solid transparent;
+	}
+
+	/* Settings Divider */
+	.wp-autoplugin-settings-divider {
+		margin: 2em 0;
+		border: 0;
+		border-top: 1px solid #c3c4c7;
+	}
+
+	/* Save Button Styling */
+	#wp-autoplugin-settings-form p.submit {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		padding: 20px;
+		background: #f0f6fc;
+		border: 1px solid #72aee6;
+		border-radius: 4px;
+		margin-top: 0;
+	}
+
+	#wp-autoplugin-settings-form p.submit .button-primary.button-large {
+		font-size: 14px;
+		padding: 8px 20px;
+		height: auto;
+	}
+
+	.wp-autoplugin-save-hint {
+		color: #3c434a;
+		font-size: 13px;
 	}
 </style>
