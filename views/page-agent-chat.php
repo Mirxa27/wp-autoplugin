@@ -79,6 +79,8 @@ if (!defined('ABSPATH')) {
                                 <li><?php esc_html_e('Search and recommend plugins from WordPress.org', 'wp-autoplugin'); ?></li>
                                 <li><?php esc_html_e('Update site settings and options', 'wp-autoplugin'); ?></li>
                                 <li><?php esc_html_e('Plan and build entire sites from a description', 'wp-autoplugin'); ?></li>
+                                <li><?php esc_html_e('Detect and work with popular plugins (WooCommerce, Yoast, Elementor, etc.)', 'wp-autoplugin'); ?></li>
+                                <li><?php esc_html_e('Manage navigation menus and theme settings', 'wp-autoplugin'); ?></li>
                             </ul>
                             <p><?php esc_html_e('Try one of these examples:', 'wp-autoplugin'); ?></p>
                         </div>

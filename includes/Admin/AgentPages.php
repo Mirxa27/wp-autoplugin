@@ -120,8 +120,9 @@ class AgentPages {
                     __('Build a portfolio site with About, Work, and Contact pages', 'wp-autoplugin'),
                     __('What plugins would you recommend for an ecommerce site?', 'wp-autoplugin'),
                     __('Create a hero section for my homepage', 'wp-autoplugin'),
-                    __('List all my published pages', 'wp-autoplugin'),
-                    __('Change the site title to "My Awesome Site"', 'wp-autoplugin')
+                    __('Detect what popular plugins I have installed', 'wp-autoplugin'),
+                    __('Create a main navigation menu with Home, About, and Contact', 'wp-autoplugin'),
+                    __('What SEO plugin am I using?', 'wp-autoplugin')
                 ]
             ],
             'context' => $this->agentManager->getContextBuilder()->buildMinimalContext()

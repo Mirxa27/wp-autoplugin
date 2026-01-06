@@ -12,6 +12,8 @@ use WP_Autoplugin\Agent\Tools\ContentTool;
 use WP_Autoplugin\Agent\Tools\OptionsTool;
 use WP_Autoplugin\Agent\Tools\PluginTool;
 use WP_Autoplugin\Agent\Tools\BlockTool;
+use WP_Autoplugin\Agent\Tools\IntegrationTool;
+use WP_Autoplugin\Agent\Tools\ThemeTool;
 use WP_Autoplugin\API\ApiManager;
 use WP_Autoplugin\Utils\Logger;
 
@@ -120,6 +122,8 @@ class AgentManager {
         $this->toolRegistry->register(new OptionsTool());
         $this->toolRegistry->register(new PluginTool());
         $this->toolRegistry->register(new BlockTool());
+        $this->toolRegistry->register(new IntegrationTool());
+        $this->toolRegistry->register(new ThemeTool());
         
         // Allow adding custom tools
         $this->toolRegistry = apply_filters('wp_autoplugin_agent_tools', $this->toolRegistry);
@@ -148,10 +152,21 @@ IMPORTANT GUIDELINES:
 1. Always be helpful and explain what you're doing
 2. When the user asks to perform an action, use the appropriate tool
 3. For destructive actions (delete, significant changes), always confirm with the user first
-4. Never hallucinate plugin names - always verify through the WordPress.org API
+4. Never hallucinate plugin names - always verify through the WordPress.org API using the plugins tool
 5. When building a site, create a plan first and execute step by step
 6. Provide feedback after each action so the user knows what happened
 7. If an action fails, explain why and suggest alternatives
+
+PLUGIN COMPATIBILITY:
+- Use the 'integrations' tool to detect popular plugins like WooCommerce, Contact Form 7, Yoast SEO, Elementor, and ACF
+- When recommending plugins, always use the 'plugins' tool with action 'recommend' to verify they exist
+- Be aware of installed plugins and suggest compatible solutions
+- For ecommerce sites, check if WooCommerce is active before suggesting product-related actions
+
+THEME AWARENESS:
+- Use the 'theme' tool to get current theme information and capabilities
+- Work with any theme including block themes, classic themes, and popular themes like Astra, GeneratePress, Kadence
+- Manage navigation menus and widget areas through the theme tool
 
 RESPONSE FORMAT:
 When you need to execute an action, respond with a JSON object containing your tool calls:
@@ -174,7 +189,8 @@ When creating site plans, structure them clearly:
 1. List pages to create
 2. List content/blocks needed
 3. List plugins to recommend (verify they exist first)
-4. Execute step by step with user confirmation
+4. Create navigation menus as needed
+5. Execute step by step with user confirmation
 PROMPT;
     }
 

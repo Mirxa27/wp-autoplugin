@@ -31,6 +31,8 @@ class ContextBuilder {
             'plugins' => $this->getPluginsSummary(),
             'theme' => $this->getThemeInfo(),
             'capabilities' => $this->getCurrentUserCapabilities(),
+            'integrations' => $this->getIntegrationsInfo(),
+            'menus' => $this->getMenusInfo(),
             'timestamp' => current_time('c')
         ];
     }
@@ -312,6 +314,86 @@ class ContextBuilder {
             'active_plugins_count' => count(get_option('active_plugins', [])),
             'can_manage_options' => current_user_can('manage_options'),
             'can_edit_posts' => current_user_can('edit_posts')
+        ];
+    }
+
+    /**
+     * Get integrations information (popular plugins detection)
+     *
+     * @return array Integrations info
+     */
+    private function getIntegrationsInfo(): array {
+        $integrations = [];
+
+        // WooCommerce
+        if (class_exists('WooCommerce')) {
+            $integrations['woocommerce'] = [
+                'active' => true,
+                'version' => defined('WC_VERSION') ? WC_VERSION : 'Unknown'
+            ];
+        }
+
+        // Contact Form 7
+        if (defined('WPCF7_VERSION')) {
+            $integrations['contact_form_7'] = [
+                'active' => true,
+                'version' => WPCF7_VERSION
+            ];
+        }
+
+        // Yoast SEO
+        if (defined('WPSEO_VERSION')) {
+            $integrations['yoast_seo'] = [
+                'active' => true,
+                'version' => WPSEO_VERSION
+            ];
+        }
+
+        // Elementor
+        if (defined('ELEMENTOR_VERSION')) {
+            $integrations['elementor'] = [
+                'active' => true,
+                'version' => ELEMENTOR_VERSION
+            ];
+        }
+
+        // ACF
+        if (class_exists('ACF')) {
+            $integrations['acf'] = [
+                'active' => true
+            ];
+        }
+
+        // Jetpack
+        if (defined('JETPACK__VERSION')) {
+            $integrations['jetpack'] = [
+                'active' => true,
+                'version' => JETPACK__VERSION
+            ];
+        }
+
+        return $integrations;
+    }
+
+    /**
+     * Get navigation menus information
+     *
+     * @return array Menus info
+     */
+    private function getMenusInfo(): array {
+        $menus = wp_get_nav_menus();
+        $locations = get_registered_nav_menus();
+        
+        return [
+            'total_menus' => count($menus),
+            'available_locations' => array_keys($locations),
+            'menus' => array_map(function($menu) {
+                return [
+                    'id' => $menu->term_id,
+                    'name' => $menu->name,
+                    'count' => $menu->count
+                ];
+            }, $menus)
         ];
     }
 }
