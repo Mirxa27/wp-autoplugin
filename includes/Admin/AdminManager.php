@@ -8,6 +8,7 @@
 
 namespace WP_Autoplugin\Admin;
 
+use WP_Autoplugin\Agent\AgentManager;
 use WP_Autoplugin\API\ApiManager;
 use WP_Autoplugin\Features\FeatureManager;
 use WP_Autoplugin\Utils\Assets;
@@ -43,6 +44,13 @@ class AdminManager {
     private Assets $assets;
 
     /**
+     * Agent Manager instance
+     *
+     * @var AgentManager
+     */
+    private AgentManager $agentManager;
+
+    /**
      * Ajax Handler instance
      *
      * @var AjaxHandler
@@ -57,12 +65,27 @@ class AdminManager {
     private AdminPages $adminPages;
 
     /**
+     * Agent Ajax Handler instance
+     *
+     * @var AgentAjaxHandler
+     */
+    private AgentAjaxHandler $agentAjaxHandler;
+
+    /**
+     * Agent Pages instance
+     *
+     * @var AgentPages
+     */
+    private AgentPages $agentPages;
+
+    /**
      * Constructor
      */
-    public function __construct(ApiManager $apiManager, FeatureManager $featureManager, Assets $assets) {
+    public function __construct(ApiManager $apiManager, FeatureManager $featureManager, Assets $assets, AgentManager $agentManager) {
         $this->apiManager = $apiManager;
         $this->featureManager = $featureManager;
         $this->assets = $assets;
+        $this->agentManager = $agentManager;
     }
 
     /**
@@ -73,12 +96,18 @@ class AdminManager {
         $this->ajaxHandler = new AjaxHandler($this->apiManager, $this->featureManager);
         $this->adminPages = new AdminPages($this->featureManager);
 
+        // Initialize agent components
+        $this->agentAjaxHandler = new AgentAjaxHandler($this->agentManager);
+        $this->agentPages = new AgentPages($this->agentManager, $this->assets);
+
         // Register hooks
         $this->registerHooks();
 
         // Initialize sub-components
         $this->ajaxHandler->initialize();
         $this->adminPages->initialize();
+        $this->agentAjaxHandler->initialize();
+        $this->agentPages->initialize();
     }
 
     /**
@@ -286,6 +315,7 @@ class AdminManager {
             'wp-autoplugin_page_wp-autoplugin-extend',
             'wp-autoplugin_page_wp-autoplugin-explain',
             'wp-autoplugin_page_wp-autoplugin-settings',
+            'wp-autoplugin_page_wp-autoplugin-agent',
             'admin_page_wp-autoplugin-history'
         ];
 
@@ -411,6 +441,13 @@ class AdminManager {
         ]);
 
         // Sub items
+        $wpAdminBar->add_node([
+            'id' => 'wp-autoplugin-agent',
+            'parent' => 'wp-autoplugin',
+            'title' => __('AI Agent', 'wp-autoplugin'),
+            'href' => admin_url('admin.php?page=wp-autoplugin-agent')
+        ]);
+
         $wpAdminBar->add_node([
             'id' => 'wp-autoplugin-generate',
             'parent' => 'wp-autoplugin',

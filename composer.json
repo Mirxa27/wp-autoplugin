@@ -9,10 +9,12 @@
             "email": "hello@wp-autoplugin.com"
         }
     ],
-    "require": {},
     "autoload": {
         "psr-4": {
             "WP_Autoplugin\\": "includes/"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
     }
 }

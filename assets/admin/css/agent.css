@@ -1,0 +1,81 @@
+/**
+ * WP-Autoplugin Agent Chat Styles
+ *
+ * @package WP-Autoplugin
+ * @since 2.1.0
+ */
+
+/* This file is intentionally minimal as styles are inline in the view */
+/* Additional styles can be added here if needed */
+
+/* Animation for dry run notice */
+.dry-run-notice {
+    background: #fff8e1;
+    border: 1px solid #ffecb3;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.dry-run-notice .dashicons {
+    color: #ff9800;
+}
+
+/* Success and error icons */
+.success-icon {
+    color: #00a32a;
+}
+
+.error-icon {
+    color: #d63638;
+}
+
+/* Action results container */
+.action-results-container {
+    margin-top: 10px;
+}
+
+.action-results {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.action-results a {
+    margin-left: 10px;
+}
+
+/* No conversations message */
+.no-conversations {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 20px;
+    font-size: 13px;
+}
+
+/* Code in messages */
+.message-text code {
+    background: #f0f0f1;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.message-text pre code {
+    background: transparent;
+    padding: 0;
+}
+
+/* Error message styling */
+.message-text.error {
+    background: #fcf0f1;
+    border-left: 3px solid #d63638;
+}

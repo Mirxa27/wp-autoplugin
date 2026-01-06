@@ -9,6 +9,7 @@
 namespace WP_Autoplugin\Core;
 
 use WP_Autoplugin\Admin\AdminManager;
+use WP_Autoplugin\Agent\AgentManager;
 use WP_Autoplugin\API\ApiManager;
 use WP_Autoplugin\Features\FeatureManager;
 use WP_Autoplugin\Utils\Assets;
@@ -155,12 +156,16 @@ final class Plugin {
         // Feature Manager
         $this->services['features'] = new FeatureManager($this->services['api']);
 
+        // Agent Manager
+        $this->services['agent'] = new AgentManager($this->services['api']);
+
         // Admin Manager (only in admin)
         if (is_admin()) {
             $this->services['admin'] = new AdminManager(
                 $this->services['api'],
                 $this->services['features'],
-                $this->services['assets']
+                $this->services['assets'],
+                $this->services['agent']
             );
         }
 
