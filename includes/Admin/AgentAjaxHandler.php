@@ -312,9 +312,21 @@ class AgentAjaxHandler {
             return;
         }
 
+        // Validate JSON is well-formed before decoding
+        if (!is_string($planJson) || !json_validate($planJson) && function_exists('json_validate')) {
+            // Fallback for PHP < 8.3 where json_validate doesn't exist
+            json_decode($planJson);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                wp_send_json_error([
+                    'message' => __('Invalid JSON format', 'wp-autoplugin')
+                ], 400);
+                return;
+            }
+        }
+
         $plan = json_decode($planJson, true);
 
-        if (!$plan) {
+        if (!$plan || !is_array($plan)) {
             wp_send_json_error([
                 'message' => __('Invalid plan format', 'wp-autoplugin')
             ], 400);
