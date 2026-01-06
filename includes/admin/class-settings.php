@@ -69,9 +69,17 @@ class Settings {
 			if ( empty( $model['name'] ) || empty( $model['url'] ) || empty( $model['apiKey'] ) ) {
 				continue;
 			}
+
+			// Validate and sanitize URL - ensure it uses HTTPS for secure API communications.
+			$url = esc_url_raw( $model['url'], [ 'https' ] );
+			if ( empty( $url ) ) {
+				// Skip models with invalid or non-HTTPS URLs.
+				continue;
+			}
+
 			$sanitized[] = [
 				'name'           => sanitize_text_field( $model['name'] ),
-				'url'            => esc_url_raw( $model['url'] ),
+				'url'            => $url,
 				'modelParameter' => isset( $model['modelParameter'] ) ? sanitize_text_field( $model['modelParameter'] ) : '',
 				'apiKey'         => sanitize_text_field( $model['apiKey'] ),
 				'headers'        => isset( $model['headers'] ) && is_array( $model['headers'] )

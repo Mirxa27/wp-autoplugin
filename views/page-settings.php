@@ -36,7 +36,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</th>
 				<td>
 					<input type="password" id="wp_autoplugin_openai_api_key" name="wp_autoplugin_openai_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_openai_api_key' ) ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'sk-...', 'wp-autoplugin' ); ?>" />
-					<p class="description"><?php esc_html_e( 'Get your API key from OpenAI at platform.openai.com', 'wp-autoplugin' ); ?></p>
+					<p class="description">
+						<?php
+						printf(
+							/* translators: %s: Link to OpenAI platform */
+							esc_html__( 'Get your API key from OpenAI at %s', 'wp-autoplugin' ),
+							'<a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">platform.openai.com</a>'
+						);
+						?>
+					</p>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -45,7 +53,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</th>
 				<td>
 					<input type="password" id="wp_autoplugin_anthropic_api_key" name="wp_autoplugin_anthropic_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_anthropic_api_key' ) ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'sk-ant-...', 'wp-autoplugin' ); ?>" />
-					<p class="description"><?php esc_html_e( 'Get your API key from Anthropic at console.anthropic.com', 'wp-autoplugin' ); ?></p>
+					<p class="description">
+						<?php
+						printf(
+							/* translators: %s: Link to Anthropic console */
+							esc_html__( 'Get your API key from Anthropic at %s', 'wp-autoplugin' ),
+							'<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">console.anthropic.com</a>'
+						);
+						?>
+					</p>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -54,7 +70,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</th>
 				<td>
 					<input type="password" id="wp_autoplugin_google_api_key" name="wp_autoplugin_google_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_google_api_key' ) ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'AIza...', 'wp-autoplugin' ); ?>" />
-					<p class="description"><?php esc_html_e( 'Get your API key from Google AI Studio at aistudio.google.com', 'wp-autoplugin' ); ?></p>
+					<p class="description">
+						<?php
+						printf(
+							/* translators: %s: Link to Google AI Studio */
+							esc_html__( 'Get your API key from Google AI Studio at %s', 'wp-autoplugin' ),
+							'<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com</a>'
+						);
+						?>
+					</p>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -63,7 +87,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</th>
 				<td>
 					<input type="password" id="wp_autoplugin_xai_api_key" name="wp_autoplugin_xai_api_key" value="<?php echo esc_attr( get_option( 'wp_autoplugin_xai_api_key' ) ); ?>" class="large-text" placeholder="<?php esc_attr_e( 'xai-...', 'wp-autoplugin' ); ?>" />
-					<p class="description"><?php esc_html_e( 'Get your API key from xAI at x.ai', 'wp-autoplugin' ); ?></p>
+					<p class="description">
+						<?php
+						printf(
+							/* translators: %s: Link to xAI */
+							esc_html__( 'Get your API key from xAI at %s', 'wp-autoplugin' ),
+							'<a href="https://console.x.ai/" target="_blank" rel="noopener noreferrer">x.ai</a>'
+						);
+						?>
+					</p>
 				</td>
 			</tr>
 		</table>
