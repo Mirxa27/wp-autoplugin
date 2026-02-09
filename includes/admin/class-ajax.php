@@ -95,6 +95,10 @@ class Ajax {
 	 * @return string The validated plugin full path.
 	 */
 	private function validate_plugin_path( $plugin_file ) {
+		if ( empty( $plugin_file ) ) {
+			wp_send_json_error( esc_html__( 'No plugin file specified.', 'wp-autoplugin' ) );
+		}
+
 		$plugin_file = str_replace( '../', '', $plugin_file );
 		$plugin_file = str_replace( '..\\', '', $plugin_file );
 		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
