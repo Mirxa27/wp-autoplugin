@@ -248,9 +248,17 @@ class AjaxHandler {
 
             // Write code to file using WP_Filesystem
             global $wp_filesystem;
+            $filesystem_initialized = true;
             if (empty($wp_filesystem)) {
                 require_once ABSPATH . 'wp-admin/includes/file.php';
-                WP_Filesystem();
+                $filesystem_initialized = WP_Filesystem();
+            }
+
+            if ($filesystem_initialized !== true || !is_object($wp_filesystem)) {
+                wp_send_json_error(
+                    ['message' => __('Failed to initialize filesystem API', 'wp-autoplugin')],
+                    500
+                );
             }
 
             $result = $wp_filesystem->put_contents($pluginFile, $code, FS_CHMOD_FILE);

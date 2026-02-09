@@ -354,7 +354,9 @@ class Admin {
 		$plugin_file = str_replace( '../', '', $plugin_file );
 		$plugin_file = str_replace( '..\\', '', $plugin_file );
 		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
-		if ( ! file_exists( $plugin_path ) || strpos( realpath( $plugin_path ), realpath( WP_PLUGIN_DIR ) ) !== 0 ) {
+		$plugin_realpath      = realpath( $plugin_path );
+		$plugins_dir_realpath = realpath( WP_PLUGIN_DIR );
+		if ( ! file_exists( $plugin_path ) || false === $plugin_realpath || false === $plugins_dir_realpath || strpos( $plugin_realpath, $plugins_dir_realpath ) !== 0 ) {
 			wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
 		}
 		$plugin_data = get_plugin_data( $plugin_path );
@@ -387,7 +389,14 @@ class Admin {
 		$plugin_file_sanitized = str_replace( '../', '', $plugin_file_sanitized );
 		$plugin_file_sanitized = str_replace( '..\\', '', $plugin_file_sanitized );
 		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file_sanitized;
-		if ( ! file_exists( $plugin_path ) || strpos( realpath( $plugin_path ), realpath( WP_PLUGIN_DIR ) ) !== 0 ) {
+		$plugin_realpath      = realpath( $plugin_path );
+		$plugins_dir_realpath = realpath( WP_PLUGIN_DIR );
+		if (
+			! file_exists( $plugin_path ) ||
+			false === $plugin_realpath ||
+			false === $plugins_dir_realpath ||
+			strpos( $plugin_realpath, $plugins_dir_realpath ) !== 0
+		) {
 			wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
 		}
 

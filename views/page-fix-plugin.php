@@ -27,7 +27,9 @@ if ( isset( $_GET['plugin'] ) ) {
 	$plugin_file      = str_replace( '../', '', $plugin_file );
 	$plugin_file      = str_replace( '..\\', '', $plugin_file );
 	$plugin_path      = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
-	if ( ! file_exists( $plugin_path ) || strpos( realpath( $plugin_path ), realpath( WP_PLUGIN_DIR ) ) !== 0 ) {
+	$real_plugin_path = realpath( $plugin_path );
+	$real_plugins_dir = realpath( WP_PLUGIN_DIR );
+	if ( ! file_exists( $plugin_path ) || false === $real_plugin_path || false === $real_plugins_dir || strpos( $real_plugin_path, $real_plugins_dir ) !== 0 ) {
 		wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
 	}
 	$plugin_data      = get_plugin_data( $plugin_path );

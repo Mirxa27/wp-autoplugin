@@ -101,9 +101,16 @@ class Ajax {
 
 		$plugin_file = str_replace( '../', '', $plugin_file );
 		$plugin_file = str_replace( '..\\', '', $plugin_file );
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+		$plugin_path = WP_PLUGIN_DIR . '/' . ltrim( $plugin_file, '/\\' );
 
-		if ( ! file_exists( $plugin_path ) || strpos( realpath( $plugin_path ), realpath( WP_PLUGIN_DIR ) ) !== 0 ) {
+		if ( ! file_exists( $plugin_path ) ) {
+			wp_send_json_error( esc_html__( 'Invalid or inaccessible plugin file.', 'wp-autoplugin' ) );
+		}
+
+		$real_plugin_path = realpath( $plugin_path );
+		$real_plugins_dir = realpath( WP_PLUGIN_DIR );
+
+		if ( false === $real_plugin_path || false === $real_plugins_dir || 0 !== strpos( $real_plugin_path, $real_plugins_dir ) ) {
 			wp_send_json_error( esc_html__( 'Invalid or inaccessible plugin file.', 'wp-autoplugin' ) );
 		}
 

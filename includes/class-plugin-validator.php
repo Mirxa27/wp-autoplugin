@@ -227,13 +227,43 @@ class Plugin_Validator {
 		// Create a temporary file for syntax checking.
 		$temp_file = wp_tempnam( 'wp_autoplugin_syntax_' );
 
+		// Ensure we have a valid temporary file path.
+		if ( ! is_string( $temp_file ) || '' === $temp_file ) {
+			return [
+				'valid' => false,
+				'error' => __( 'Unable to create temporary file for syntax check.', 'wp-autoplugin' ),
+			];
+		}
+
 		global $wp_filesystem;
 		if ( empty( $wp_filesystem ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
-			WP_Filesystem();
+			if ( ! WP_Filesystem() ) {
+				wp_delete_file( $temp_file );
+				return [
+					'valid' => false,
+					'error' => __( 'Filesystem initialization failed during syntax check.', 'wp-autoplugin' ),
+				];
+			}
 		}
 
-		$wp_filesystem->put_contents( $temp_file, $code, FS_CHMOD_FILE );
+		// Ensure filesystem API is available and usable.
+		if ( ! is_object( $wp_filesystem ) || ! method_exists( $wp_filesystem, 'put_contents' ) ) {
+			wp_delete_file( $temp_file );
+			return [
+				'valid' => false,
+				'error' => __( 'Filesystem is not available for syntax check.', 'wp-autoplugin' ),
+			];
+		}
+
+		$written = $wp_filesystem->put_contents( $temp_file, $code, FS_CHMOD_FILE );
+		if ( ! $written ) {
+			wp_delete_file( $temp_file );
+			return [
+				'valid' => false,
+				'error' => __( 'Failed to write temporary file for syntax check.', 'wp-autoplugin' ),
+			];
+		}
 
 		// Use PHP's built-in syntax checker via php -l.
 		// escapeshellarg() prevents command injection.
