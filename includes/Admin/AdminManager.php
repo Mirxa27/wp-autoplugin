@@ -538,6 +538,7 @@ class AdminManager {
      */
     private function getPluginStats(): array {
         global $wpdb;
+        // Table name is constructed from the trusted $wpdb->prefix and a hardcoded suffix.
         $table = $wpdb->prefix . 'autoplugin_operations';
 
         $stats = [
@@ -546,9 +547,15 @@ class AdminManager {
             'total_extended' => 0
         ];
 
+        // Validate table name only contains safe characters (alphanumeric and underscore).
+        if ( ! preg_match( '/^[a-zA-Z0-9_]+$/', $table ) ) {
+            return $stats;
+        }
+
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table ) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $table is validated above with preg_match
             $stats['total_generated'] = (int) $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT COUNT(*) FROM `{$table}` WHERE operation_type = %s AND status = %s",
@@ -556,7 +563,6 @@ class AdminManager {
                     'completed'
                 )
             );
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $stats['total_fixed'] = (int) $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT COUNT(*) FROM `{$table}` WHERE operation_type = %s AND status = %s",
@@ -564,7 +570,6 @@ class AdminManager {
                     'completed'
                 )
             );
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $stats['total_extended'] = (int) $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT COUNT(*) FROM `{$table}` WHERE operation_type = %s AND status = %s",
@@ -572,6 +577,8 @@ class AdminManager {
                     'completed'
                 )
             );
+            // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         }
 
         return $stats;

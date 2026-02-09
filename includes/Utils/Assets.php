@@ -249,7 +249,10 @@ class Assets {
         
         if (!empty($critical)) {
             add_action('wp_head', function() use ($critical) {
-                echo '<style id="wp-autoplugin-critical">' . wp_strip_all_tags( $critical ) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS content is stripped of tags
+                // Use wp_add_inline_style which handles CSS output properly
+                wp_register_style( 'wp-autoplugin-critical', false ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+                wp_enqueue_style( 'wp-autoplugin-critical' );
+                wp_add_inline_style( 'wp-autoplugin-critical', $critical );
             }, 1);
         }
     }
