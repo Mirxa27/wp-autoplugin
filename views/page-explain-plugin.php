@@ -25,9 +25,13 @@ $is_plugin_active = false;
 if ( isset( $_GET['plugin'] ) ) {
 	$plugin_file      = sanitize_text_field( wp_unslash( $_GET['plugin'] ) );
 	$plugin_file      = str_replace( '../', '', $plugin_file );
+	$plugin_file      = str_replace( '..\\', '', $plugin_file );
 	$is_plugin_active = is_plugin_active( $plugin_file );
 }
 $plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+if ( ! file_exists( $plugin_path ) || ( $plugin_file && strpos( realpath( $plugin_path ), realpath( WP_PLUGIN_DIR ) ) !== 0 ) ) {
+	wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
+}
 $plugin_data = get_plugin_data( $plugin_path );
 
 ?>

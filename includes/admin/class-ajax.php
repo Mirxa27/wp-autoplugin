@@ -89,6 +89,24 @@ class Ajax {
 	}
 
 	/**
+	 * Validate and sanitize a plugin file path, preventing path traversal.
+	 *
+	 * @param string $plugin_file The plugin file relative path.
+	 * @return string The validated plugin full path.
+	 */
+	private function validate_plugin_path( $plugin_file ) {
+		$plugin_file = str_replace( '../', '', $plugin_file );
+		$plugin_file = str_replace( '..\\', '', $plugin_file );
+		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+
+		if ( ! file_exists( $plugin_path ) || strpos( realpath( $plugin_path ), realpath( WP_PLUGIN_DIR ) ) !== 0 ) {
+			wp_send_json_error( esc_html__( 'Invalid or inaccessible plugin file.', 'wp-autoplugin' ) );
+		}
+
+		return $plugin_path;
+	}
+
+	/**
 	 * AJAX handler for generating a plugin plan.
 	 *
 	 * @return void
@@ -170,7 +188,7 @@ class Ajax {
 			? sanitize_text_field( wp_unslash( $_POST['plugin_file'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is done in the parent method.
 			: '';
 
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+		$plugin_path = $this->validate_plugin_path( $plugin_file );
 		$plugin_code = file_get_contents( $plugin_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file read.
 		if ( false === $plugin_code ) {
 			wp_send_json_error( esc_html__( 'Failed to read the plugin file.', 'wp-autoplugin' ) );
@@ -200,7 +218,7 @@ class Ajax {
 			? sanitize_text_field( wp_unslash( $_POST['plugin_file'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is done in the parent method.
 			: '';
 
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+		$plugin_path = $this->validate_plugin_path( $plugin_file );
 		$plugin_code = file_get_contents( $plugin_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file read.
 		if ( false === $plugin_code ) {
 			wp_send_json_error( esc_html__( 'Failed to read the plugin file.', 'wp-autoplugin' ) );
@@ -258,7 +276,7 @@ class Ajax {
 			? sanitize_text_field( wp_unslash( $_POST['plugin_file'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is done in the parent method.
 			: '';
 
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+		$plugin_path = $this->validate_plugin_path( $plugin_file );
 		$plugin_code = file_get_contents( $plugin_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file read.
 		if ( false === $plugin_code ) {
 			wp_send_json_error( esc_html__( 'Failed to read the plugin file.', 'wp-autoplugin' ) );
@@ -287,7 +305,7 @@ class Ajax {
 			? sanitize_text_field( wp_unslash( $_POST['plugin_file'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is done in the parent method.
 			: '';
 
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+		$plugin_path = $this->validate_plugin_path( $plugin_file );
 		$plugin_code = file_get_contents( $plugin_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file read.
 		if ( false === $plugin_code ) {
 			wp_send_json_error( esc_html__( 'Failed to read the plugin file.', 'wp-autoplugin' ) );
@@ -342,7 +360,7 @@ class Ajax {
 			? sanitize_text_field( wp_unslash( $_POST['plugin_file'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is done in the parent method.
 			: '';
 
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+		$plugin_path = $this->validate_plugin_path( $plugin_file );
 		$plugin_code = file_get_contents( $plugin_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file read.
 		if ( false === $plugin_code ) {
 			wp_send_json_error( esc_html__( 'Failed to read the plugin file.', 'wp-autoplugin' ) );
@@ -378,6 +396,10 @@ class Ajax {
 	 * @return void
 	 */
 	public function ajax_add_model() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => esc_html__( 'You are not allowed to access this page.', 'wp-autoplugin' ) ] );
+		}
+
 		if ( ! check_ajax_referer( 'wp_autoplugin_nonce', 'nonce', false ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'wp-autoplugin' ) ] );
 		}
@@ -419,6 +441,10 @@ class Ajax {
 	 * @return void
 	 */
 	public function ajax_remove_model() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => esc_html__( 'You are not allowed to access this page.', 'wp-autoplugin' ) ] );
+		}
+
 		if ( ! check_ajax_referer( 'wp_autoplugin_nonce', 'nonce', false ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'wp-autoplugin' ) ] );
 		}
@@ -469,7 +495,8 @@ class Ajax {
 		}
 
 		// Get original plugin name from the plugin file.
-		$plugin_data          = get_plugin_data( WP_CONTENT_DIR . '/plugins/' . $plugin_file );
+		$plugin_data_path     = $this->validate_plugin_path( $plugin_file );
+		$plugin_data          = get_plugin_data( $plugin_data_path );
 		$original_plugin_name = $plugin_data['Name'];
 
 		$plugin_changes = sanitize_text_field( wp_unslash( $_POST['plugin_issue'] ) );
@@ -520,7 +547,8 @@ class Ajax {
 		$plugin_name = isset( $_POST['plugin_name'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin_name'] ) ) : '';
 
 		// Get original plugin name from the plugin file.
-		$plugin_data          = get_plugin_data( WP_CONTENT_DIR . '/plugins/' . $plugin_file );
+		$plugin_data_path     = $this->validate_plugin_path( $plugin_file );
+		$plugin_data          = get_plugin_data( $plugin_data_path );
 		$original_plugin_name = $plugin_data['Name'];
 
 		$extender = new \WP_Autoplugin\Hooks_Extender( $this->ai_api );

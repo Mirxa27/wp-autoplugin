@@ -246,8 +246,14 @@ class AjaxHandler {
                 wp_mkdir_p($pluginDir);
             }
 
-            // Write code to file
-            $result = file_put_contents($pluginFile, $code); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+            // Write code to file using WP_Filesystem
+            global $wp_filesystem;
+            if (empty($wp_filesystem)) {
+                require_once ABSPATH . 'wp-admin/includes/file.php';
+                WP_Filesystem();
+            }
+
+            $result = $wp_filesystem->put_contents($pluginFile, $code, FS_CHMOD_FILE);
 
             if ($result === false) {
                 throw new \Exception(__('Failed to write plugin file', 'wp-autoplugin'));

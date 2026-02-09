@@ -39,7 +39,7 @@ if ( isset( $_GET['error_message'] ) && check_admin_referer( 'extend-plugin', 'e
 	$value = sprintf(
 		// translators: %s: error message.
 		esc_html__( 'Error while activating the plugin: %s', 'wp-autoplugin' ),
-		sanitize_text_field( wp_unslash( $_GET['error_message'] ) )
+		esc_html( sanitize_text_field( wp_unslash( $_GET['error_message'] ) ) )
 	);
 }
 
