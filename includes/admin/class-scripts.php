@@ -141,6 +141,7 @@ class Scripts {
 			if ( isset( $_GET['plugin'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- Nonce verification is not needed here.
 				$plugin_file      = sanitize_text_field( wp_unslash( $_GET['plugin'] ) ); // phpcs:ignore WordPress.Security.NonceVerification -- Nonce verification is not needed here.
 				$plugin_file      = str_replace( '../', '', $plugin_file );
+				$plugin_file      = str_replace( '..\\', '', $plugin_file );
 				$is_plugin_active = is_plugin_active( $plugin_file );
 			}
 
@@ -198,6 +199,7 @@ class Scripts {
 			if ( isset( $_GET['plugin'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- Nonce verification is not needed here.
 				$plugin_file      = sanitize_text_field( wp_unslash( $_GET['plugin'] ) ); // phpcs:ignore WordPress.Security.NonceVerification -- Nonce verification is not needed here.
 				$plugin_file      = str_replace( '../', '', $plugin_file );
+				$plugin_file      = str_replace( '..\\', '', $plugin_file );
 				$is_plugin_active = is_plugin_active( $plugin_file );
 			}
 
@@ -303,6 +305,7 @@ class Scripts {
 			if ( isset( $_GET['plugin'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- Nonce verification is not needed here.
 				$plugin_file      = sanitize_text_field( wp_unslash( $_GET['plugin'] ) ); // phpcs:ignore WordPress.Security.NonceVerification -- Nonce verification is not needed here.
 				$plugin_file      = str_replace( '../', '', $plugin_file );
+				$plugin_file      = str_replace( '..\\', '', $plugin_file );
 				$is_plugin_active = is_plugin_active( $plugin_file );
 			}
 

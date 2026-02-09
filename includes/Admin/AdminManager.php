@@ -229,7 +229,7 @@ class AdminManager {
         }
 
         // Get current page
-        $page = $_GET['page'] ?? '';
+        $page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
         // Core dependencies
         $deps = [
@@ -416,8 +416,8 @@ class AdminManager {
      */
     public function addActionLinks($links): array {
         $actionLinks = [
-            '<a href="' . admin_url('admin.php?page=wp-autoplugin-settings') . '">' . __('Settings', 'wp-autoplugin') . '</a>',
-            '<a href="' . admin_url('admin.php?page=wp-autoplugin-generate') . '">' . __('Generate Plugin', 'wp-autoplugin') . '</a>'
+            '<a href="' . esc_url( admin_url('admin.php?page=wp-autoplugin-settings') ) . '">' . esc_html__('Settings', 'wp-autoplugin') . '</a>',
+            '<a href="' . esc_url( admin_url('admin.php?page=wp-autoplugin-generate') ) . '">' . esc_html__('Generate Plugin', 'wp-autoplugin') . '</a>'
         ];
 
         return array_merge($actionLinks, $links);
@@ -546,15 +546,31 @@ class AdminManager {
             'total_extended' => 0
         ];
 
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") === $table) {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) ) === $table ) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $stats['total_generated'] = (int) $wpdb->get_var(
-                "SELECT COUNT(*) FROM $table WHERE operation_type = 'generate' AND status = 'completed'"
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$table}` WHERE operation_type = %s AND status = %s",
+                    'generate',
+                    'completed'
+                )
             );
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $stats['total_fixed'] = (int) $wpdb->get_var(
-                "SELECT COUNT(*) FROM $table WHERE operation_type = 'fix' AND status = 'completed'"
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$table}` WHERE operation_type = %s AND status = %s",
+                    'fix',
+                    'completed'
+                )
             );
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $stats['total_extended'] = (int) $wpdb->get_var(
-                "SELECT COUNT(*) FROM $table WHERE operation_type = 'extend' AND status = 'completed'"
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$table}` WHERE operation_type = %s AND status = %s",
+                    'extend',
+                    'completed'
+                )
             );
         }
 

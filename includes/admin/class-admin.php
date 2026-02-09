@@ -352,8 +352,9 @@ class Admin {
 		}
 		$plugin_file = sanitize_text_field( wp_unslash( $_GET['plugin'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		$plugin_file = str_replace( '../', '', $plugin_file );
+		$plugin_file = str_replace( '..\\', '', $plugin_file );
 		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
-		if ( ! file_exists( $plugin_path ) ) {
+		if ( ! file_exists( $plugin_path ) || strpos( realpath( $plugin_path ), realpath( WP_PLUGIN_DIR ) ) !== 0 ) {
 			wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
 		}
 		$plugin_data = get_plugin_data( $plugin_path );
@@ -382,14 +383,17 @@ class Admin {
 		}
 
 		// Check if the plugin file exists in /wp-content/plugins/.
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . sanitize_text_field( wp_unslash( $_GET['plugin'] ) );
-		if ( ! file_exists( $plugin_path ) ) {
+		$plugin_file_sanitized = sanitize_text_field( wp_unslash( $_GET['plugin'] ) );
+		$plugin_file_sanitized = str_replace( '../', '', $plugin_file_sanitized );
+		$plugin_file_sanitized = str_replace( '..\\', '', $plugin_file_sanitized );
+		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file_sanitized;
+		if ( ! file_exists( $plugin_path ) || strpos( realpath( $plugin_path ), realpath( WP_PLUGIN_DIR ) ) !== 0 ) {
 			wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
 		}
 
 		// Check if it's a WP-Autoplugin generated plugin in the DB.
 		$plugins = get_option( 'wp_autoplugins', [] );
-		if ( ! in_array( sanitize_text_field( wp_unslash( $_GET['plugin'] ) ), $plugins, true ) ) {
+		if ( ! in_array( $plugin_file_sanitized, $plugins, true ) ) {
 			wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
 		}
 

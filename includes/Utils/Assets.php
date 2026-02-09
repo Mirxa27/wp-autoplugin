@@ -249,7 +249,7 @@ class Assets {
         
         if (!empty($critical)) {
             add_action('wp_head', function() use ($critical) {
-                echo '<style id="wp-autoplugin-critical">' . $critical . '</style>';
+                echo '<style id="wp-autoplugin-critical">' . wp_strip_all_tags( $critical ) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS content is stripped of tags
             }, 1);
         }
     }

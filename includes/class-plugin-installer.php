@@ -51,7 +51,7 @@ class Plugin_Installer {
 	public function install_plugin( $code, $plugin_name ) {
 		// If DISALLOW_FILE_MODS is set, we can't install plugins.
 		if ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS ) {
-			return \WP_Error( 'file_mods_disabled', 'Plugin installation is disabled.' );
+			return new \WP_Error( 'file_mods_disabled', 'Plugin installation is disabled.' );
 		}
 
 		// Initialize WP_Filesystem.
@@ -65,11 +65,8 @@ class Plugin_Installer {
 		if ( strpos( $plugin_name, '/' ) !== false && substr( $plugin_name, -4 ) === '.php' ) {
 			$plugin_file = WP_PLUGIN_DIR . '/' . $plugin_name;
 			// If file exists, check if writable using WP_Filesystem.
-			if ( $wp_filesystem->exists( $plugin_file ) /* && additional writable check if needed. */ ) {
-				// File exists, proceed without additional operations.
-				$dummy = true;
-			} else {
-				return \WP_Error( 'file_creation_error', 'Error updating plugin file.' );
+			if ( ! $wp_filesystem->exists( $plugin_file ) ) {
+				return new \WP_Error( 'file_creation_error', 'Error updating plugin file.' );
 			}
 		} else {
 			$plugin_name = sanitize_title( $plugin_name, 'wp-autoplugin-' . md5( $code ) );
