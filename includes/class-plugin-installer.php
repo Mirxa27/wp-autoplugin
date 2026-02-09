@@ -79,7 +79,7 @@ class Plugin_Installer {
 
 		$result = $wp_filesystem->put_contents( $plugin_file, $code, FS_CHMOD_FILE );
 		if ( false === $result ) {
-			return \WP_Error( 'file_creation_error', 'Error creating plugin file.' );
+			return new \WP_Error( 'file_creation_error', 'Error creating plugin file.' );
 		}
 
 		// Add the plugin to the list of autoplugins.

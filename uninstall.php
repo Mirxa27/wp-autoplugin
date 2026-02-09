@@ -46,7 +46,11 @@ delete_transient( 'wp_autoplugin_errors' );
 // Remove custom database tables.
 global $wpdb;
 $table_name = $wpdb->prefix . 'autoplugin_operations';
-$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $table_name ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange
+// Validate table name contains only safe characters before using in query.
+if ( preg_match( '/^[a-zA-Z0-9_]+$/', $table_name ) ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+	$wpdb->query( "DROP TABLE IF EXISTS `{$table_name}`" );
+}
 
 // Remove log files directory.
 $log_dir = WP_CONTENT_DIR . '/wp-autoplugin-logs/';
