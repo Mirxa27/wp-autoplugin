@@ -54,11 +54,25 @@ class Plugin_Installer {
 			return new \WP_Error( 'file_mods_disabled', 'Plugin installation is disabled.' );
 		}
 
+		// Sanitize plugin name: strip path traversal sequences and reject absolute paths.
+		$plugin_name = str_replace( '../', '', $plugin_name );
+		$plugin_name = str_replace( '..\\', '', $plugin_name );
+
+		if ( empty( $plugin_name ) || $plugin_name !== ltrim( $plugin_name, '/\\' ) ) {
+			return new \WP_Error( 'invalid_plugin_name', 'Invalid plugin name.' );
+		}
+
 		// Initialize WP_Filesystem.
 		global $wp_filesystem;
 		if ( empty( $wp_filesystem ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
-			WP_Filesystem();
+			if ( ! WP_Filesystem() ) {
+				return new \WP_Error( 'filesystem_error', 'Failed to initialize filesystem.' );
+			}
+		}
+
+		if ( ! is_object( $wp_filesystem ) ) {
+			return new \WP_Error( 'filesystem_error', 'Filesystem is not available.' );
 		}
 
 		$plugin_file = '';
@@ -75,6 +89,13 @@ class Plugin_Installer {
 				$wp_filesystem->mkdir( $plugin_dir, 0755, true );
 			}
 			$plugin_file = $plugin_dir . 'index.php';
+		}
+
+		// Validate the resolved path stays within WP_PLUGIN_DIR.
+		$real_plugins_dir = realpath( WP_PLUGIN_DIR );
+		$plugin_file_dir  = realpath( dirname( $plugin_file ) );
+		if ( false === $real_plugins_dir || false === $plugin_file_dir || 0 !== strpos( $plugin_file_dir, $real_plugins_dir ) ) {
+			return new \WP_Error( 'path_traversal', 'Plugin path is outside the plugins directory.' );
 		}
 
 		$result = $wp_filesystem->put_contents( $plugin_file, $code, FS_CHMOD_FILE );

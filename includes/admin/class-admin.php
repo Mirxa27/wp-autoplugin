@@ -353,7 +353,7 @@ class Admin {
 		$plugin_file = sanitize_text_field( wp_unslash( $_GET['plugin'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
 		$plugin_file = str_replace( '../', '', $plugin_file );
 		$plugin_file = str_replace( '..\\', '', $plugin_file );
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+		$plugin_path = WP_PLUGIN_DIR . '/' . $plugin_file;
 		$plugin_realpath      = realpath( $plugin_path );
 		$plugins_dir_realpath = realpath( WP_PLUGIN_DIR );
 		if ( ! file_exists( $plugin_path ) || false === $plugin_realpath || false === $plugins_dir_realpath || strpos( $plugin_realpath, $plugins_dir_realpath ) !== 0 ) {
@@ -388,7 +388,7 @@ class Admin {
 		$plugin_file_sanitized = sanitize_text_field( wp_unslash( $_GET['plugin'] ) );
 		$plugin_file_sanitized = str_replace( '../', '', $plugin_file_sanitized );
 		$plugin_file_sanitized = str_replace( '..\\', '', $plugin_file_sanitized );
-		$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file_sanitized;
+		$plugin_path = WP_PLUGIN_DIR . '/' . $plugin_file_sanitized;
 		$plugin_realpath      = realpath( $plugin_path );
 		$plugins_dir_realpath = realpath( WP_PLUGIN_DIR );
 		if (
