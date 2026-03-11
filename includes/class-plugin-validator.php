@@ -226,18 +226,62 @@ class Plugin_Validator {
 	private function check_php_syntax( $code ) {
 		// Create a temporary file for syntax checking.
 		$temp_file = wp_tempnam( 'wp_autoplugin_syntax_' );
-		file_put_contents( $temp_file, $code );
 
-		// Use PHP's built-in syntax checker.
-		$output = shell_exec( sprintf( 'php -l %s 2>&1', escapeshellarg( $temp_file ) ) );
-		unlink( $temp_file );
+		// Ensure we have a valid temporary file path.
+		if ( ! is_string( $temp_file ) || '' === $temp_file ) {
+			return [
+				'valid' => false,
+				'error' => __( 'Unable to create temporary file for syntax check.', 'wp-autoplugin' ),
+			];
+		}
 
-		if ( strpos( $output, 'No syntax errors' ) !== false ) {
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			if ( ! WP_Filesystem() ) {
+				wp_delete_file( $temp_file );
+				return [
+					'valid' => false,
+					'error' => __( 'Filesystem initialization failed during syntax check.', 'wp-autoplugin' ),
+				];
+			}
+		}
+
+		// Ensure filesystem API is available and usable.
+		if ( ! is_object( $wp_filesystem ) || ! method_exists( $wp_filesystem, 'put_contents' ) ) {
+			wp_delete_file( $temp_file );
+			return [
+				'valid' => false,
+				'error' => __( 'Filesystem is not available for syntax check.', 'wp-autoplugin' ),
+			];
+		}
+
+		$written = $wp_filesystem->put_contents( $temp_file, $code, FS_CHMOD_FILE );
+		if ( ! $written ) {
+			wp_delete_file( $temp_file );
+			return [
+				'valid' => false,
+				'error' => __( 'Failed to write temporary file for syntax check.', 'wp-autoplugin' ),
+			];
+		}
+
+		// Use PHP's built-in syntax checker via php -l.
+		// escapeshellarg() prevents command injection.
+		$output     = null;
+		$return_var = 0;
+		$escaped    = escapeshellarg( $temp_file );
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
+		exec( sprintf( 'php -l %s 2>&1', $escaped ), $output, $return_var );
+		wp_delete_file( $temp_file );
+
+		$output_str = implode( "\n", $output );
+
+		if ( $return_var === 0 && strpos( $output_str, 'No syntax errors' ) !== false ) {
 			return [ 'valid' => true ];
 		}
 
 		// Extract error message.
-		preg_match( '/Parse error: (.+) in/', $output, $matches );
+		preg_match( '/Parse error: (.+) in/', $output_str, $matches );
 		$error = isset( $matches[1] ) ? $matches[1] : __( 'Unknown syntax error', 'wp-autoplugin' );
 
 		return [

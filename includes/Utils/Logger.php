@@ -63,7 +63,15 @@ class Logger {
             // Add .htaccess to prevent direct access
             $htaccess = $logDir . '/.htaccess';
             if (!file_exists($htaccess)) {
-                file_put_contents($htaccess, 'Deny from all');
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+                file_put_contents($htaccess, 'Deny from all'); // Simple static content, WP_Filesystem not always available at this point
+            }
+
+            // Also add an index.php file for extra security
+            $indexFile = $logDir . '/index.php';
+            if (!file_exists($indexFile)) {
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+                file_put_contents($indexFile, '<?php // Silence is golden.');
             }
         }
     }
@@ -238,7 +246,7 @@ class Logger {
         
         foreach ($files as $file) {
             if (filemtime($file) < $cutoffTime) {
-                unlink($file);
+                wp_delete_file($file);
             }
         }
     }

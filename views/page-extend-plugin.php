@@ -25,9 +25,25 @@ $is_plugin_active = false;
 if ( isset( $_GET['plugin'] ) ) {
 	$plugin_file      = sanitize_text_field( wp_unslash( $_GET['plugin'] ) );
 	$plugin_file      = str_replace( '../', '', $plugin_file );
+	$plugin_file      = str_replace( '..\\', '', $plugin_file );
 	$is_plugin_active = is_plugin_active( $plugin_file );
 }
-$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+
+if ( empty( $plugin_file ) ) {
+	wp_die( esc_html__( 'No plugin specified.', 'wp-autoplugin' ) );
+}
+
+$plugin_path          = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+$plugin_realpath      = realpath( $plugin_path );
+$plugins_dir_realpath = realpath( WP_PLUGIN_DIR );
+if (
+	! file_exists( $plugin_path ) ||
+	false === $plugin_realpath ||
+	false === $plugins_dir_realpath ||
+	strpos( $plugin_realpath, $plugins_dir_realpath ) !== 0
+) {
+	wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
+}
 $plugin_data = get_plugin_data( $plugin_path );
 
 $value = '';
@@ -35,7 +51,7 @@ if ( isset( $_GET['error_message'] ) && check_admin_referer( 'extend-plugin', 'e
 	$value = sprintf(
 		// translators: %s: error message.
 		esc_html__( 'Error while activating the plugin: %s', 'wp-autoplugin' ),
-		sanitize_text_field( wp_unslash( $_GET['error_message'] ) )
+		esc_html( sanitize_text_field( wp_unslash( $_GET['error_message'] ) ) )
 	);
 }
 

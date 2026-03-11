@@ -51,25 +51,36 @@ class Plugin_Installer {
 	public function install_plugin( $code, $plugin_name ) {
 		// If DISALLOW_FILE_MODS is set, we can't install plugins.
 		if ( defined( 'DISALLOW_FILE_MODS' ) && DISALLOW_FILE_MODS ) {
-			return \WP_Error( 'file_mods_disabled', 'Plugin installation is disabled.' );
+			return new \WP_Error( 'file_mods_disabled', 'Plugin installation is disabled.' );
+		}
+
+		// Sanitize plugin name: strip path traversal sequences and reject absolute paths.
+		$plugin_name = str_replace( '../', '', $plugin_name );
+		$plugin_name = str_replace( '..\\', '', $plugin_name );
+
+		if ( empty( $plugin_name ) || $plugin_name !== ltrim( $plugin_name, '/\\' ) ) {
+			return new \WP_Error( 'invalid_plugin_name', 'Invalid plugin name.' );
 		}
 
 		// Initialize WP_Filesystem.
 		global $wp_filesystem;
 		if ( empty( $wp_filesystem ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
-			WP_Filesystem();
+			if ( ! WP_Filesystem() ) {
+				return new \WP_Error( 'filesystem_error', 'Failed to initialize filesystem.' );
+			}
+		}
+
+		if ( ! is_object( $wp_filesystem ) ) {
+			return new \WP_Error( 'filesystem_error', 'Filesystem is not available.' );
 		}
 
 		$plugin_file = '';
 		if ( strpos( $plugin_name, '/' ) !== false && substr( $plugin_name, -4 ) === '.php' ) {
 			$plugin_file = WP_PLUGIN_DIR . '/' . $plugin_name;
 			// If file exists, check if writable using WP_Filesystem.
-			if ( $wp_filesystem->exists( $plugin_file ) /* && additional writable check if needed. */ ) {
-				// File exists, proceed without additional operations.
-				$dummy = true;
-			} else {
-				return \WP_Error( 'file_creation_error', 'Error updating plugin file.' );
+			if ( ! $wp_filesystem->exists( $plugin_file ) ) {
+				return new \WP_Error( 'file_creation_error', 'Error updating plugin file.' );
 			}
 		} else {
 			$plugin_name = sanitize_title( $plugin_name, 'wp-autoplugin-' . md5( $code ) );
@@ -80,9 +91,16 @@ class Plugin_Installer {
 			$plugin_file = $plugin_dir . 'index.php';
 		}
 
+		// Validate the resolved path stays within WP_PLUGIN_DIR.
+		$real_plugins_dir = realpath( WP_PLUGIN_DIR );
+		$plugin_file_dir  = realpath( dirname( $plugin_file ) );
+		if ( false === $real_plugins_dir || false === $plugin_file_dir || 0 !== strpos( $plugin_file_dir, $real_plugins_dir ) ) {
+			return new \WP_Error( 'path_traversal', 'Plugin path is outside the plugins directory.' );
+		}
+
 		$result = $wp_filesystem->put_contents( $plugin_file, $code, FS_CHMOD_FILE );
 		if ( false === $result ) {
-			return \WP_Error( 'file_creation_error', 'Error creating plugin file.' );
+			return new \WP_Error( 'file_creation_error', 'Error creating plugin file.' );
 		}
 
 		// Add the plugin to the list of autoplugins.

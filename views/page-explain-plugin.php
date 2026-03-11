@@ -25,9 +25,20 @@ $is_plugin_active = false;
 if ( isset( $_GET['plugin'] ) ) {
 	$plugin_file      = sanitize_text_field( wp_unslash( $_GET['plugin'] ) );
 	$plugin_file      = str_replace( '../', '', $plugin_file );
+	$plugin_file      = str_replace( '..\\', '', $plugin_file );
 	$is_plugin_active = is_plugin_active( $plugin_file );
 }
-$plugin_path = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+
+if ( empty( $plugin_file ) ) {
+	wp_die( esc_html__( 'No plugin specified.', 'wp-autoplugin' ) );
+}
+
+$plugin_path          = WP_CONTENT_DIR . '/plugins/' . $plugin_file;
+$plugin_real_path     = realpath( $plugin_path );
+$plugin_dir_real_path = realpath( WP_PLUGIN_DIR );
+if ( ! file_exists( $plugin_path ) || false === $plugin_real_path || false === $plugin_dir_real_path || strpos( $plugin_real_path, $plugin_dir_real_path ) !== 0 ) {
+	wp_die( esc_html__( 'The specified plugin does not exist.', 'wp-autoplugin' ) );
+}
 $plugin_data = get_plugin_data( $plugin_path );
 
 ?>
